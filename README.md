@@ -20,6 +20,7 @@ A lightweight static page that showcases:
 - trigger-based workflows
 - group summaries
 - operator-console vibes for demos
+- app subpages like Raj Bala's Health Tracker
 
 ## Firebase Hosting auto deploy
 
