@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockPulse Board</title>
+    <meta
+      name="description"
+      content="Sample builder subpage for the OpenClaw meetup site. Shows how a hacker app can live under the shared website with its own UI and data model."
+    />
+    <style>
+      :root {
+        --bg: #07110d;
+        --bg-soft: #0c1b15;
+        --panel: rgba(10, 26, 18, 0.84);
+        --panel-strong: rgba(5, 15, 10, 0.96);
+        --line: rgba(95, 255, 135, 0.16);
+        --text: #ddffe4;
+        --muted: #92bea0;
+        --green: #69ff94;
+        --cyan: #65f1ff;
+        --amber: #ffd166;
+        --shadow: 0 0 30px rgba(57, 216, 122, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(101, 241, 255, 0.09), transparent 28%),
+          radial-gradient(circle at top right, rgba(105, 255, 148, 0.08), transparent 32%),
+          linear-gradient(180deg, #07120d 0%, #030705 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: linear-gradient(rgba(105, 255, 148, 0.04) 1px, transparent 1px);
+        background-size: 100% 3px;
+        opacity: 0.35;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(12px);
+        background: rgba(4, 10, 6, 0.76);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: var(--green);
+        box-shadow: 0 0 18px var(--green);
+      }
+
+      .nav {
+        display: flex;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      main {
+        padding: 42px 0 64px;
+      }
+
+      .hero {
+        border: 1px solid rgba(105, 255, 148, 0.2);
+        border-radius: 28px;
+        padding: 30px;
+        background:
+          radial-gradient(circle at top right, rgba(255, 209, 102, 0.12), transparent 28%),
+          linear-gradient(180deg, rgba(10, 24, 16, 0.96), rgba(4, 11, 7, 0.98));
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow,
+      .mono {
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      .eyebrow {
+        color: var(--green);
+        text-transform: uppercase;
+        font-size: 0.84rem;
+        letter-spacing: 0.12em;
+      }
+
+      h1 {
+        margin: 14px 0 12px;
+        font-size: clamp(2.7rem, 7vw, 4.8rem);
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+      }
+
+      .lead {
+        margin: 0;
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 1.05rem;
+      }
+
+      .hero-meta,
+      .dashboard,
+      .tables {
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero-meta {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-top: 24px;
+      }
+
+      .card,
+      .table-card,
+      .data-card {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .label {
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.76rem;
+      }
+
+      .value {
+        display: block;
+        margin-top: 10px;
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .dashboard {
+        grid-template-columns: 1.05fr 0.95fr;
+        margin-top: 26px;
+      }
+
+      .section-card {
+        padding: 22px;
+      }
+
+      .section-card h2 {
+        margin: 0 0 10px;
+        font-size: 1.6rem;
+        letter-spacing: -0.04em;
+      }
+
+      .section-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .watchlist {
+        margin-top: 18px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid rgba(95, 255, 135, 0.08);
+      }
+
+      th {
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .gain {
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .tables {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 18px;
+      }
+
+      .table-card,
+      .data-card {
+        padding: 20px;
+      }
+
+      .table-card h3,
+      .data-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.12rem;
+      }
+
+      .table-card p,
+      .data-card p,
+      .data-card li {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .table-card p,
+      .data-card p {
+        margin: 0;
+      }
+
+      .data-card ul {
+        margin: 14px 0 0;
+        padding-left: 18px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 26px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(105, 255, 148, 0.22);
+        font-weight: 700;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, rgba(105, 255, 148, 0.18), rgba(101, 241, 255, 0.1));
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--muted);
+      }
+
+      .footer {
+        margin-top: 32px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 960px) {
+        .hero-meta,
+        .dashboard,
+        .tables {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          display: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .wrap {
+          width: min(100% - 20px, 1180px);
+        }
+
+        .hero,
+        .section-card,
+        .table-card,
+        .data-card,
+        .card {
+          padding: 18px;
+        }
+
+        th,
+        td {
+          padding: 12px;
+          font-size: 0.92rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="/">
+          <span class="brand-mark"></span>
+          <span>OpenClaw Apps</span>
+        </a>
+        <nav class="nav">
+          <a href="/">Back to launchpad</a>
+          <a href="#data-model">Data model</a>
+          <a href="#watchlist">Watchlist</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap">
+        <section class="hero">
+          <div class="eyebrow">&gt; sample builder subpage</div>
+          <h1>StockPulse Board</h1>
+          <p class="lead">
+            This is the pattern each hacker can use under the shared site. It has its own route, its own app identity,
+            and its own data surface while still living inside the same Firebase project and Hosting setup.
+          </p>
+          <div class="hero-meta">
+            <div class="card">
+              <span class="label">Built by</span>
+              <span class="value">Riley Chen and Maya Ortiz</span>
+            </div>
+            <div class="card">
+              <span class="label">Recommended app path</span>
+              <span class="value mono">apps/stock-pulse/*</span>
+            </div>
+            <div class="card">
+              <span class="label">Firebase data zone</span>
+              <span class="value mono">apps/stock-pulse/*</span>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary" href="/">Back to app launchpad</a>
+            <a class="btn btn-secondary" href="#data-model">Inspect data structure</a>
+          </div>
+        </section>
+
+        <section class="dashboard" id="watchlist">
+          <div class="card section-card">
+            <div class="eyebrow">&gt; live board mock</div>
+            <h2>Watchlist movers</h2>
+            <p>
+              The UI below is static for now, but it is shaped like a Firebase-backed app. Tomorrow, this table can be
+              filled from Realtime Database, Firestore, or Data Connect rows scoped to this app route only.
+            </p>
+            <div class="watchlist">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticker</th>
+                    <th>Move</th>
+                    <th>Catalyst</th>
+                    <th>Owner</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="mono">NVDA</td>
+                    <td class="gain">+3.8%</td>
+                    <td>AI conference momentum</td>
+                    <td>Riley</td>
+                  </tr>
+                  <tr>
+                    <td class="mono">PLTR</td>
+                    <td class="gain">+2.1%</td>
+                    <td>Government contract chatter</td>
+                    <td>Maya</td>
+                  </tr>
+                  <tr>
+                    <td class="mono">TSLA</td>
+                    <td class="gain">+1.4%</td>
+                    <td>Delivery rumor scan</td>
+                    <td>Team</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="data-card section-card">
+            <div class="eyebrow">&gt; project boundaries</div>
+            <h2>How this stays isolated</h2>
+            <p>
+              Everyone can share the same Firebase project as long as each app gets its own path namespace and security
+              rules are written with those namespaces in mind.
+            </p>
+            <ul>
+              <li>Hosting route: <span class="mono">/apps/stock-pulse/</span></li>
+              <li>Realtime path: <span class="mono">apps/stock-pulse/watchlist</span></li>
+              <li>Firestore collection: <span class="mono">apps_stock_pulse_watchlist</span></li>
+              <li>Data Connect table group: <span class="mono">stock_pulse_*</span></li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="data-model">
+          <div class="eyebrow">&gt; suggested db tables and paths</div>
+          <div class="tables">
+            <article class="table-card">
+              <h3>Realtime Database shape</h3>
+              <p class="mono">apps/stock-pulse/watchlist/{ticker}</p>
+              <p class="mono">apps/stock-pulse/notes/{noteId}</p>
+              <p class="mono">apps/stock-pulse/alerts/{alertId}</p>
+            </article>
+            <article class="table-card">
+              <h3>Data Connect or SQL-style tables</h3>
+              <p class="mono">stock_pulse_watchlist</p>
+              <p class="mono">stock_pulse_notes</p>
+              <p class="mono">stock_pulse_alerts</p>
+            </article>
+            <article class="table-card">
+              <h3>Starter fields</h3>
+              <p>
+                <span class="mono">ticker</span>, <span class="mono">owner</span>, <span class="mono">thesis</span>,
+                <span class="mono">catalyst</span>, <span class="mono">priority</span>, <span class="mono">createdAt</span>
+              </p>
+            </article>
+            <article class="table-card">
+              <h3>Next wiring step</h3>
+              <p>
+                Add Firebase SDK code for the chosen backend, then read and write only inside the
+                <span class="mono">apps/stock-pulse</span> namespace.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          Sample app route for the OpenClaw meetup. Duplicate this folder for each hacker app and update the card on the homepage.
+        </footer>
+      </div>
+    </main>
+  </body>
+</html>

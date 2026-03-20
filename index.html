@@ -333,6 +333,104 @@
         gap: 18px;
       }
 
+      .apps-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .app-card {
+        display: block;
+        padding: 24px;
+        border: 1px solid rgba(105, 255, 148, 0.22);
+        border-radius: 24px;
+        background:
+          radial-gradient(circle at top right, rgba(101, 241, 255, 0.12), transparent 35%),
+          linear-gradient(180deg, rgba(10, 24, 15, 0.96), rgba(4, 11, 7, 0.96));
+        box-shadow: var(--shadow);
+        transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      }
+
+      .app-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(105, 255, 148, 0.4);
+        box-shadow: 0 18px 40px rgba(57, 216, 122, 0.14);
+      }
+
+      .app-card-top {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .app-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(101, 241, 255, 0.18);
+        background: rgba(101, 241, 255, 0.08);
+        color: var(--cyan);
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .app-card h3 {
+        margin: 16px 0 10px;
+        font-size: 1.7rem;
+        letter-spacing: -0.04em;
+      }
+
+      .app-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .app-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .app-meta-block {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .app-meta-label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .app-meta-value {
+        display: block;
+        margin-top: 8px;
+        font-weight: 700;
+      }
+
+      .app-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(105, 255, 148, 0.12);
+        color: var(--green);
+        font-weight: 700;
+      }
+
       .panel {
         padding: 22px;
       }
@@ -408,7 +506,8 @@
         .hero-grid,
         .features,
         .commands,
-        .demo-grid {
+        .demo-grid,
+        .apps-grid {
           grid-template-columns: 1fr;
         }
 
@@ -431,11 +530,16 @@
         .panel,
         .feature,
         .command,
-        .timeline-item {
+        .timeline-item,
+        .app-card {
           padding: 18px;
         }
 
         .hero-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .app-meta {
           grid-template-columns: 1fr;
         }
       }
@@ -449,6 +553,7 @@
           <span>OpenClaw Meetup</span>
         </a>
         <nav class="nav">
+          <a href="#apps">Apps</a>
           <a href="#features">Why it hits</a>
           <a href="#commands">Trigger menu</a>
           <a href="#demo">Demo flow</a>
@@ -478,6 +583,7 @@
                 It’s fast, weirdly practical, and perfect for a live demo.
               </p>
               <div class="hero-actions">
+                <a class="btn btn-primary" href="#apps">Browse hacker apps</a>
                 <a class="btn btn-primary" href="#launch">Open the demo playbook</a>
                 <a class="btn btn-secondary" href="#commands">See the trigger menu</a>
               </div>
@@ -582,6 +688,74 @@
                 New members get a clean intro, five working norms, and the live trigger menu so they can contribute immediately.
               </p>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="apps">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">&gt; hacker launch grid</div>
+              <h2>Big buttons. One app per builder.</h2>
+            </div>
+            <p>
+              Each card is a front door into someone’s project. Add their app name, a one-line pitch, builder names,
+              and link straight into their workspace under this same site.
+            </p>
+          </div>
+          <div class="apps-grid">
+            <a class="app-card" href="/apps/stock-pulse/">
+              <div class="app-card-top">
+                <span class="app-badge">Live sample</span>
+                <span class="command-label">/apps/stock-pulse</span>
+              </div>
+              <h3>StockPulse Board</h3>
+              <p>
+                Tracks watchlist movers, catalyst notes, and trader callouts in one place. This sample subpage shows
+                the pattern for a user app with its own UI, data model, and room to wire in Firebase-backed records.
+              </p>
+              <div class="app-meta">
+                <div class="app-meta-block">
+                  <span class="app-meta-label">Built by</span>
+                  <span class="app-meta-value">Riley Chen and Maya Ortiz</span>
+                </div>
+                <div class="app-meta-block">
+                  <span class="app-meta-label">Backend shape</span>
+                  <span class="app-meta-value">Shared Firebase project, isolated app paths</span>
+                </div>
+              </div>
+              <div class="app-card-footer">
+                <span>Open app workspace</span>
+                <span>&gt;</span>
+              </div>
+            </a>
+
+            <a class="app-card" href="#launch">
+              <div class="app-card-top">
+                <span class="app-badge">Template slot</span>
+                <span class="command-label">/apps/your-app</span>
+              </div>
+              <h3>Your Next Build Here</h3>
+              <p>
+                Duplicate the sample app folder, swap in the new app name and builder names, then point this card to
+                the new route. It keeps the landing page consistent while every builder ships their own experience.
+              </p>
+              <div class="app-meta">
+                <div class="app-meta-block">
+                  <span class="app-meta-label">Built by</span>
+                  <span class="app-meta-value">Add the hacker names</span>
+                </div>
+                <div class="app-meta-block">
+                  <span class="app-meta-label">Use case</span>
+                  <span class="app-meta-value">Dashboards, trackers, tools, demos</span>
+                </div>
+              </div>
+              <div class="app-card-footer">
+                <span>Use the sample as the starting point</span>
+                <span>&gt;</span>
+              </div>
+            </a>
           </div>
         </div>
       </section>
