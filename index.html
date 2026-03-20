@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenClaw Meetup — Terminal Demo</title>
+    <meta
+      name="description"
+      content="A hacker-style landing page for the OpenClaw meetup demo — chat-driven automation, workflows, summaries, and AI agents that actually get work done."
+    />
+    <style>
+      :root {
+        --bg: #06110a;
+        --bg-soft: #0a1810;
+        --panel: rgba(9, 24, 14, 0.82);
+        --panel-strong: rgba(8, 20, 12, 0.95);
+        --line: rgba(95, 255, 135, 0.16);
+        --text: #d9ffe2;
+        --muted: #8fbe99;
+        --green: #69ff94;
+        --green-2: #39d87a;
+        --amber: #ffd166;
+        --cyan: #65f1ff;
+        --shadow: 0 0 30px rgba(57, 216, 122, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(66, 255, 122, 0.1), transparent 36%),
+          linear-gradient(180deg, #07130b 0%, #030704 100%);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: linear-gradient(rgba(105, 255, 148, 0.045) 1px, transparent 1px);
+        background-size: 100% 3px;
+        mix-blend-mode: soft-light;
+        opacity: 0.35;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(12px);
+        background: rgba(4, 10, 6, 0.72);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .brand-mark {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: var(--green);
+        box-shadow: 0 0 18px var(--green);
+      }
+
+      .nav {
+        display: flex;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .hero {
+        padding: 68px 0 32px;
+      }
+
+      .terminal {
+        position: relative;
+        border: 1px solid rgba(105, 255, 148, 0.2);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(8, 21, 12, 0.96), rgba(4, 11, 6, 0.95));
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .terminal-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .terminal-dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .terminal-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+      }
+
+      .dot-red { background: #ff6b6b; }
+      .dot-amber { background: var(--amber); }
+      .dot-green { background: var(--green); }
+
+      .terminal-label {
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 26px;
+        padding: 28px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+        color: var(--green);
+        font-size: 0.88rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      h1 {
+        margin: 18px 0 16px;
+        font-size: clamp(2.8rem, 7vw, 5.5rem);
+        line-height: 0.98;
+        letter-spacing: -0.06em;
+      }
+
+      .lead {
+        margin: 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.8;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(105, 255, 148, 0.22);
+        font-weight: 700;
+        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, rgba(105, 255, 148, 0.18), rgba(101, 241, 255, 0.1));
+        color: var(--text);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--muted);
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .stat,
+      .panel,
+      .command,
+      .feature,
+      .timeline-item {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .stat {
+        padding: 18px;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .stat-value {
+        margin-top: 10px;
+        font-size: 1.8rem;
+        font-weight: 800;
+      }
+
+      section {
+        padding: 32px 0;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 22px;
+      }
+
+      .section-head h2 {
+        margin: 8px 0 0;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        letter-spacing: -0.04em;
+      }
+
+      .section-head p {
+        margin: 0;
+        max-width: 640px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .feature {
+        padding: 22px;
+      }
+
+      .feature-kicker {
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+        color: var(--cyan);
+        font-size: 0.84rem;
+      }
+
+      .feature h3 {
+        margin: 12px 0 10px;
+        font-size: 1.25rem;
+      }
+
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .commands {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .command {
+        padding: 20px;
+      }
+
+      .command-label {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(105, 255, 148, 0.08);
+        border: 1px solid rgba(105, 255, 148, 0.16);
+        color: var(--green);
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 0.88rem;
+      }
+
+      .command p {
+        margin: 14px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 18px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .terminal-shot {
+        background: var(--panel-strong);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+        color: var(--green);
+        min-height: 320px;
+        white-space: pre-wrap;
+        line-height: 1.65;
+        overflow: hidden;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 14px;
+      }
+
+      .timeline-item {
+        padding: 18px;
+      }
+
+      .timeline-item strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .timeline-item p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .cta {
+        padding-bottom: 72px;
+      }
+
+      .cta-box {
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid rgba(105, 255, 148, 0.18);
+        background:
+          radial-gradient(circle at top right, rgba(105, 255, 148, 0.12), transparent 35%),
+          linear-gradient(180deg, rgba(11, 28, 17, 0.95), rgba(5, 12, 8, 0.96));
+        box-shadow: var(--shadow);
+      }
+
+      .cta-box h2 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        letter-spacing: -0.05em;
+      }
+
+      .cta-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+        max-width: 700px;
+      }
+
+      .footer {
+        border-top: 1px solid var(--line);
+        padding: 18px 0 42px;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .features,
+        .commands,
+        .demo-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          display: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .wrap {
+          width: min(100% - 20px, 1180px);
+        }
+
+        .hero {
+          padding-top: 30px;
+        }
+
+        .hero-grid,
+        .cta-box,
+        .panel,
+        .feature,
+        .command,
+        .timeline-item {
+          padding: 18px;
+        }
+
+        .hero-stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="#top">
+          <span class="brand-mark"></span>
+          <span>OpenClaw Meetup</span>
+        </a>
+        <nav class="nav">
+          <a href="#features">Why it hits</a>
+          <a href="#commands">Trigger menu</a>
+          <a href="#demo">Demo flow</a>
+          <a href="#launch">Launch</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="wrap terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dots">
+              <span class="dot-red"></span>
+              <span class="dot-amber"></span>
+              <span class="dot-green"></span>
+            </div>
+            <div class="terminal-label">/demo/openclaw-meetup — live operator console</div>
+          </div>
+          <div class="hero-grid">
+            <div>
+              <div class="eyebrow">&gt; chat-native automation for people who hate dashboards</div>
+              <h1>Run AI workflows from the group chat.</h1>
+              <p class="lead">
+                OpenClaw turns everyday chat into an operator console. Ask for summaries, launch workflows,
+                steer agents, and keep the room synced without bouncing between tabs, docs, and terminals.
+                It’s fast, weirdly practical, and perfect for a live demo.
+              </p>
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="#launch">Open the demo playbook</a>
+                <a class="btn btn-secondary" href="#commands">See the trigger menu</a>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="stat">
+                <div class="stat-label">Interface</div>
+                <div class="stat-value">Chat-first</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Vibe</div>
+                <div class="stat-value">Terminal</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Demo-ready</div>
+                <div class="stat-value">Tomorrow</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Best feature</div>
+                <div class="stat-value">Actually useful</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">&gt; why this lands in a room full of builders</div>
+              <h2>Made for operator brains.</h2>
+            </div>
+            <p>
+              This group exists to explore how OpenClaw can save time, tighten workflows, and make AI feel
+              less like a toy and more like an actual teammate.
+            </p>
+          </div>
+          <div class="features">
+            <article class="feature">
+              <div class="feature-kicker">01 / SUMMARIZE</div>
+              <h3>Turn noisy threads into signal</h3>
+              <p>
+                Use lightweight triggers like <strong>TL;DR</strong> to compress discussions into a clean readout of
+                key topics, decisions, questions, and next steps.
+              </p>
+            </article>
+            <article class="feature">
+              <div class="feature-kicker">02 / ROUTE</div>
+              <h3>Kick off workflows from plain English</h3>
+              <p>
+                Whether it’s stock workflows, coding tasks, or research, the interface is the same: say the thing,
+                get the workflow.
+              </p>
+            </article>
+            <article class="feature">
+              <div class="feature-kicker">03 / DEMO</div>
+              <h3>Show capability without context switching</h3>
+              <p>
+                Great demos are fast. Chat-driven controls let you show summaries, commands, automation, and live
+                delegation in one place.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="commands">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">&gt; current trigger menu</div>
+              <h2>Type less. Trigger more.</h2>
+            </div>
+            <p>
+              The power move is keeping the interface memorable. A tiny command surface beats a complicated control panel.
+            </p>
+          </div>
+          <div class="commands">
+            <article class="command">
+              <span class="command-label">TL;DR</span>
+              <p>
+                Summarize the current group discussion into a short, useful brief so everyone can catch up instantly.
+              </p>
+            </article>
+            <article class="command">
+              <span class="command-label">stock workflows</span>
+              <p>
+                Launch the stock workflow menu and branch into insider activity, earnings reaction, filings, comparison,
+                technical levels, scanners, and backtest ideas.
+              </p>
+            </article>
+            <article class="command">
+              <span class="command-label">insider XOM</span>
+              <p>
+                Run a focused insider read on a ticker with a fast narrative interpretation instead of dumping raw data.
+              </p>
+            </article>
+            <article class="command">
+              <span class="command-label">welcome flow</span>
+              <p>
+                New members get a clean intro, five working norms, and the live trigger menu so they can contribute immediately.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="demo">
+        <div class="wrap demo-grid">
+          <div class="panel">
+            <div class="eyebrow">&gt; what the room sees</div>
+            <h2 style="margin: 12px 0 10px; font-size: 2rem; letter-spacing: -0.04em;">A terminal aesthetic with social UX.</h2>
+            <p style="margin: 0; color: var(--muted); line-height: 1.8;">
+              The whole point is not just “AI in chat.” It’s giving a group a shared command surface for workflows,
+              summaries, research, and coordination without turning the conversation into mush.
+            </p>
+            <div class="timeline" style="margin-top: 18px;">
+              <div class="timeline-item">
+                <strong>1. Ask in plain language</strong>
+                <p>Kick off a summary, stock workflow, or task from the same thread where the work is happening.</p>
+              </div>
+              <div class="timeline-item">
+                <strong>2. Get structured output</strong>
+                <p>Responses come back concise, useful, and shaped for the context — not generic chatbot sludge.</p>
+              </div>
+              <div class="timeline-item">
+                <strong>3. Iterate in public</strong>
+                <p>The group sees the prompts, the results, and the improvements in real time, which makes the demo stronger.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="eyebrow">&gt; simulated operator log</div>
+            <div class="terminal-shot" id="terminal-output"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="launch" class="cta">
+        <div class="wrap">
+          <div class="cta-box">
+            <div class="eyebrow">&gt; tomorrow’s playbook</div>
+            <h2>Demo the group like a live control room.</h2>
+            <p>
+              Show how OpenClaw can welcome, summarize, route workflows, and answer real questions inside the same chat.
+              That’s the story: less friction, more leverage, better group coordination.
+            </p>
+            <div class="hero-actions" style="margin-top: 24px;">
+              <a class="btn btn-primary" href="https://github.com/droidment/openclawdemo" target="_blank" rel="noreferrer">View repo</a>
+              <a class="btn btn-secondary" href="#commands">Use the trigger menu</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        OpenClaw Meetup — hacker terminal landing page for the demo repo.
+      </div>
+    </footer>
+
+    <script>
+      const lines = [
+        '$ openclaw status',
+        '> gateway: online',
+        '> whatsapp: connected',
+        '> group: OpenClaw meetup',
+        '',
+        '$ trigger "TL;DR"',
+        '> summarizing discussion…',
+        '> output: main topics / ideas / next steps',
+        '',
+        '$ trigger "stock workflows"',
+        '> menu loaded: insider / earnings / compare / scanner / backtest',
+        '',
+        '$ ask "insider XOM"',
+        '> recent signal: insider selling, not buying',
+        '',
+        '$ demo tomorrow',
+        '> status: ready',
+        '> vibe: terminal-maximalist',
+        '> outcome: people get it instantly'
+      ];
+
+      const target = document.getElementById('terminal-output');
+      let lineIndex = 0;
+      let charIndex = 0;
+
+      function type() {
+        if (!target) return;
+        if (lineIndex >= lines.length) return;
+
+        const current = lines[lineIndex];
+        if (charIndex < current.length) {
+          target.textContent += current.charAt(charIndex);
+          charIndex += 1;
+          setTimeout(type, 18);
+          return;
+        }
+
+        target.textContent += '\n';
+        lineIndex += 1;
+        charIndex = 0;
+        setTimeout(type, 120);
+      }
+
+      type();
+    </script>
+  </body>
+</html>
