@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReClip - Downloader</title>
+    <meta
+      name="description"
+      content="Ported ReClip downloader UI inside the OpenClaw app launchpad."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f4f1eb;
+        --fg: #353330;
+        --muted: #8f8a7d;
+        --accent: #e85d2a;
+        --line: #ddd6ca;
+        --card: rgba(255, 255, 255, 0.88);
+        --success: #2b8451;
+        --error: #c43d3d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+        color: var(--fg);
+        background:
+          radial-gradient(circle at top right, rgba(232, 93, 42, 0.14), transparent 24%),
+          linear-gradient(180deg, #f5f2eb 0%, #efe8dd 100%);
+      }
+      a { color: inherit; text-decoration: none; }
+      .wrap { width: min(1080px, calc(100% - 24px)); margin: 0 auto; }
+      .topbar {
+        position: sticky; top: 0; z-index: 10;
+        backdrop-filter: blur(10px);
+        background: rgba(244, 241, 235, 0.84);
+        border-bottom: 1px solid rgba(53, 51, 48, 0.08);
+      }
+      .topbar-inner, .hero-actions, .controls, .api-row, .card-actions {
+        display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      }
+      .topbar-inner { justify-content: space-between; padding: 14px 0; }
+      .brand { display: inline-flex; align-items: center; gap: 12px; font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      .brand-mark { width: 12px; height: 12px; border-radius: 999px; background: var(--accent); }
+      .nav { display: flex; gap: 18px; color: var(--muted); font-size: 0.82rem; }
+      main { padding: 30px 0 64px; }
+      .panel, .clip-card {
+        border: 1px solid rgba(53, 51, 48, 0.08);
+        border-radius: 24px;
+        background: var(--card);
+        box-shadow: 0 24px 60px rgba(53, 51, 48, 0.08);
+      }
+      .hero, .setup, .workspace, .footer-note { padding: 24px; }
+      .setup, .workspace, .footer-note { margin-top: 18px; }
+      .hero-grid, .setup-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; }
+      .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .meta-card { padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255, 255, 255, 0.7); }
+      .eyebrow, label, .meta-label, .card-meta {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      h1, h2, .card-title {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-weight: 400;
+        letter-spacing: -0.04em;
+      }
+      h1 { margin: 14px 0 12px; font-size: clamp(3rem, 8vw, 5.5rem); line-height: 0.95; }
+      h1 em { color: var(--accent); font-style: italic; }
+      h2 { margin: 10px 0 8px; font-size: 2rem; }
+      .lead, .copy, .note { color: var(--muted); line-height: 1.8; }
+      .btn, .fetch-btn, .save-btn, .reset-btn, .card-btn, .pill, .q-chip, input, textarea {
+        font: inherit; border-radius: 12px;
+      }
+      .pill-group {
+        display: flex;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.9);
+        overflow: hidden;
+      }
+      .btn, .fetch-btn, .save-btn, .reset-btn, .card-btn {
+        border: 0; padding: 13px 16px; cursor: pointer;
+      }
+      .btn-primary, .fetch-btn, .save-btn { background: var(--accent); color: #fff; }
+      .btn-secondary, .reset-btn { background: rgba(53, 51, 48, 0.08); color: var(--fg); }
+      input, textarea {
+        width: 100%; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.9);
+        color: var(--fg); padding: 14px 16px; outline: none;
+      }
+      textarea { min-height: 80px; resize: vertical; margin-top: 12px; }
+      .status-pill {
+        display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+        background: rgba(53, 51, 48, 0.06); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+      }
+      .status-dot { width: 8px; height: 8px; border-radius: 999px; background: #c58e1e; }
+      .status-dot.ok { background: var(--success); }
+      .notes { display: grid; gap: 12px; }
+      .note-card { padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255, 255, 255, 0.55); }
+      .cards { display: grid; gap: 12px; margin-top: 24px; }
+      .clip-card { display: flex; gap: 14px; padding: 14px; border-radius: 18px; }
+      .thumb {
+        width: 140px; min-width: 140px; height: 92px; border-radius: 12px; overflow: hidden;
+        background: #ece6db; display: flex; align-items: center; justify-content: center;
+      }
+      .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .thumb.loading, .skeleton { background: linear-gradient(90deg, #ebe7e0 25%, #f3efe7 50%, #ebe7e0 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+      .body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+      .card-title { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .card-meta { margin-top: 4px; }
+      .card-btn { background: var(--fg); color: #fff; padding: 8px 14px; }
+      .card-btn.done { background: var(--success); }
+      .card-btn.error { background: var(--error); }
+      .card-status { color: var(--muted); font-size: 0.74rem; }
+      .card-status.error { color: var(--error); }
+      .card-status.done { color: var(--success); }
+      .card-status.downloading { color: var(--accent); }
+      .q-chip { padding: 6px 10px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+      .q-chip.active { border-color: var(--fg); color: var(--fg); }
+      .hint { margin: 8px 0 0; color: var(--muted); font-size: 0.75rem; line-height: 1.7; }
+      .dl-all-bar { display: flex; }
+      .dl-all-btn { border: 0; border-radius: 12px; background: var(--accent); color: #fff; padding: 12px 16px; cursor: pointer; }
+      .spin {
+        display: inline-block; width: 11px; height: 11px; border: 2px solid currentColor;
+        border-right-color: transparent; border-radius: 50%; animation: spin 0.65s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+      @media (max-width: 960px) {
+        .hero-grid, .setup-grid, .meta-grid { grid-template-columns: 1fr; }
+        .nav { display: none; }
+      }
+      @media (max-width: 640px) {
+        .clip-card { flex-direction: column; }
+        .thumb { width: 100%; min-width: 0; height: 180px; }
+        .card-title { white-space: normal; }
+        .api-row, .controls { flex-direction: column; align-items: stretch; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="/"><span class="brand-mark"></span><span>OpenClaw Apps</span></a>
+        <nav class="nav">
+          <a href="/">Back to launchpad</a>
+          <a href="#setup">Backend setup</a>
+          <a href="#workspace">Workspace</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <div class="wrap">
+        <section class="panel hero">
+          <div class="hero-grid">
+            <div>
+              <div class="eyebrow">&gt; media downloader port</div>
+              <h1>Re<em>Clip</em></h1>
+              <p class="lead">
+                This brings the ReClip UI into the OpenClaw launchpad. The download engine still
+                lives behind a Flask plus yt-dlp backend, so this page lets you configure the API
+                base instead of assuming the static site can do the work itself.
+              </p>
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="#workspace">Open downloader</a>
+                <a class="btn btn-secondary" href="#setup">Configure backend</a>
+              </div>
+            </div>
+            <div class="meta-grid">
+              <article class="meta-card"><span class="meta-label">Route</span><div>/apps/reclip/</div></article>
+              <article class="meta-card"><span class="meta-label">Frontend</span><div>Vanilla HTML, CSS, JS</div></article>
+              <article class="meta-card"><span class="meta-label">Backend</span><div>Flask + yt-dlp + ffmpeg</div></article>
+              <article class="meta-card"><span class="meta-label">Source</span><div>reclipvideos</div></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel setup" id="setup">
+          <div class="setup-grid">
+            <div>
+              <div class="eyebrow">&gt; backend wiring</div>
+              <h2>Point the UI at a downloader service.</h2>
+              <p class="copy">
+                Same-origin is simplest. If you use another host, that backend must allow cross-origin
+                browser requests. The original Flask app is same-origin by default.
+              </p>
+              <label for="api-base">API base URL</label>
+              <div class="api-row" style="margin-top: 10px;">
+                <input id="api-base" type="text" placeholder="Blank = same origin, or use http://127.0.0.1:8899" />
+                <button class="save-btn" id="save-api-btn" type="button">Save</button>
+                <button class="reset-btn" id="reset-api-btn" type="button">Use same origin</button>
+              </div>
+              <div class="status-pill" style="margin-top: 12px;">
+                <span class="status-dot" id="connection-dot"></span>
+                <span id="connection-text">Same-origin mode selected</span>
+              </div>
+            </div>
+            <div class="notes">
+              <div class="note-card"><strong>Expected endpoints</strong><div class="note">/api/info, /api/download, /api/status/:id, and /api/file/:id</div></div>
+              <div class="note-card"><strong>Why this split exists</strong><div class="note">Firebase Hosting is static. Python, yt-dlp, ffmpeg, and file streaming still need a real backend runtime.</div></div>
+              <div class="note-card"><strong>Fast path</strong><div class="note">Run the original Flask app locally, then point this page at that base URL.</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel workspace" id="workspace">
+          <div class="eyebrow">&gt; downloader workspace</div>
+          <h2>Queue clips and save the output.</h2>
+          <p class="copy">Paste one or more URLs, choose MP4 or MP3, fetch metadata, then download.</p>
+          <textarea id="urls" placeholder="Paste one or more URLs..." rows="2"></textarea>
+          <p class="hint">Separate links with spaces, commas, or new lines.</p>
+          <div class="controls">
+            <div class="pill-group">
+              <button class="pill active" data-format="video" type="button">MP4</button>
+              <button class="pill" data-format="audio" type="button">MP3</button>
+            </div>
+            <button class="fetch-btn" id="go-btn" type="button">Fetch</button>
+          </div>
+          <div id="cards" class="cards"></div>
+        </section>
+
+        <section class="panel footer-note">
+          <div class="eyebrow">&gt; port scope</div>
+          <h2>What moved here</h2>
+          <p class="copy">
+            The downloader interface and interaction model are now under <code>/apps/reclip/</code>.
+            The execution backend remains separate because this site is static-only.
+          </p>
+        </section>
+      </div>
+    </main>
+    <script>
+      const API_KEY = "openclaw-reclip-api-base";
+      const urlsInput = document.getElementById("urls");
+      const cardsEl = document.getElementById("cards");
+      const goBtn = document.getElementById("go-btn");
+      const apiBaseInput = document.getElementById("api-base");
+      const saveApiBtn = document.getElementById("save-api-btn");
+      const resetApiBtn = document.getElementById("reset-api-btn");
+      const connectionDot = document.getElementById("connection-dot");
+      const connectionText = document.getElementById("connection-text");
+      const formatButtons = Array.from(document.querySelectorAll(".pill"));
+
+      let currentFormat = "video";
+      let cardData = [];
+
+      function normalizeBase(value) {
+        return (value || "").trim().replace(/\/+$/, "");
+      }
+
+      function getApiBase() {
+        return normalizeBase(localStorage.getItem(API_KEY) || "");
+      }
+
+      function setApiBase(value) {
+        const normalized = normalizeBase(value);
+        if (normalized) localStorage.setItem(API_KEY, normalized);
+        else localStorage.removeItem(API_KEY);
+        apiBaseInput.value = normalized;
+        renderConnection();
+      }
+
+      function apiUrl(path) {
+        const base = getApiBase();
+        return base ? `${base}${path}` : path;
+      }
+
+      function renderConnection() {
+        const base = getApiBase();
+        connectionDot.className = "status-dot";
+        if (!base) {
+          connectionText.textContent = "Same-origin mode selected";
+          return;
+        }
+        try {
+          const target = new URL(base, window.location.href);
+          if (target.origin === window.location.origin) {
+            connectionDot.classList.add("ok");
+            connectionText.textContent = `API base set to ${target.pathname || "/"}`;
+            return;
+          }
+        } catch {}
+        connectionText.textContent = `Cross-origin API base set to ${base}`;
+      }
+
+      function setFormat(format) {
+        currentFormat = format;
+        formatButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.format === format);
+        });
+      }
+
+      function parseUrls(text) {
+        return [...new Set(text.split(/[\s,]+/).map((item) => item.trim()).filter((item) => item.startsWith("http")))];
+      }
+
+      function esc(value) {
+        const div = document.createElement("div");
+        div.textContent = value || "";
+        return div.innerHTML;
+      }
+
+      function fmtDur(seconds) {
+        if (!seconds && seconds !== 0) return "";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      function friendlyError(error) {
+        const message = String(error || "");
+        if (message.includes("Unexpected token <")) return "The route returned HTML. The downloader API is probably missing.";
+        if (message.includes("Failed to fetch")) return "Could not reach the downloader backend.";
+        if (message.includes("CORS")) return "Browser blocked the API call. Enable CORS or proxy the requests.";
+        if (message.includes("Unsupported URL")) return "This URL is not supported";
+        if (message.includes("Video unavailable")) return "Video is unavailable or private";
+        if (message.includes("Private video")) return "This video is private";
+        if (message.includes("HTTP Error 403")) return "Access denied by the platform";
+        if (message.includes("HTTP Error 404")) return "Video not found";
+        return message.length > 120 ? `${message.slice(0, 120)}...` : message;
+      }
+
+      async function requestJson(path, options) {
+        const response = await fetch(apiUrl(path), options);
+        const text = await response.text();
+        let data;
+        try { data = text ? JSON.parse(text) : {}; } catch { throw new Error(text || "Unexpected non-JSON response"); }
+        if (!response.ok || data.error) throw new Error(data.error || `Request failed with ${response.status}`);
+        return data;
+      }
+
+      function audioThumb() {
+        return '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+      }
+
+      function imageFallback() {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2"></rect><circle cx="8" cy="8" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>';
+      }
+
+      function renderCard(index) {
+        const clip = cardData[index];
+        let el = document.getElementById(`card-${index}`);
+        if (!el) {
+          el = document.createElement("div");
+          el.id = `card-${index}`;
+          cardsEl.appendChild(el);
+        }
+
+        if (clip.status === "loading") {
+          el.className = "clip-card";
+          el.innerHTML = '<div class="thumb loading"></div><div class="body"><div class="skeleton" style="height:12px;border-radius:4px;margin-bottom:8px;"></div><div class="skeleton" style="width:42%;height:12px;border-radius:4px;"></div></div>';
+          return;
+        }
+
+        if (clip.status === "info-error") {
+          el.className = "clip-card";
+          el.innerHTML = `<div class="thumb">${imageFallback()}</div><div class="body"><div class="card-title">Could not fetch clip metadata</div><div class="card-meta">${esc(clip.url)}</div><div class="card-actions"><span class="card-status error">${esc(friendlyError(clip.error))}</span></div></div>`;
+          return;
+        }
+
+        const isAudio = currentFormat === "audio";
+        const thumb = isAudio ? audioThumb() : clip.thumbnail ? `<img src="${clip.thumbnail}" alt="">` : imageFallback();
+        let quality = "";
+        if (!isAudio && Array.isArray(clip.formats) && clip.formats.length > 1) {
+          quality = clip.formats.map((format) => `<button class="q-chip${format.id === clip.selectedFormatId ? " active" : ""}" type="button" onclick="pickFormat(${index}, '${format.id}')">${format.label}</button>`).join("");
+        }
+
+        let actions = "";
+        if (clip.status === "ready") {
+          actions = `<button class="card-btn" type="button" onclick="dlCard(${index})">Download</button>${quality}`;
+        } else if (clip.status === "downloading") {
+          actions = '<span class="card-status downloading"><span class="spin"></span> Downloading...</span>';
+        } else if (clip.status === "done") {
+          actions = `<button class="card-btn done" type="button" onclick="saveCard(${index})">Save</button><span class="card-status done">${esc(clip.filename || "Ready to save")}</span>`;
+        } else if (clip.status === "error") {
+          actions = `<button class="card-btn error" type="button" onclick="dlCard(${index})">Retry</button><span class="card-status error">${esc(friendlyError(clip.error))}</span>`;
+        }
+
+        el.className = "clip-card";
+        el.innerHTML = `<div class="thumb">${thumb}</div><div class="body"><div class="card-title">${esc(clip.title || "Untitled")}</div><div class="card-meta">${esc(clip.uploader || "Unknown source")}${clip.duration ? ` | ${fmtDur(clip.duration)}` : ""}</div><div class="card-actions">${actions}</div></div>`;
+      }
+
+      function renderDownloadAll() {
+        const existing = document.getElementById("dl-all-bar");
+        if (existing) existing.remove();
+        if (cardData.filter((item) => item.status === "ready").length < 2) return;
+        const bar = document.createElement("div");
+        bar.id = "dl-all-bar";
+        bar.className = "dl-all-bar";
+        bar.innerHTML = '<button class="dl-all-btn" type="button" onclick="dlAll()">Download All</button>';
+        cardsEl.appendChild(bar);
+      }
+
+      async function go() {
+        const urls = parseUrls(urlsInput.value);
+        if (!urls.length) return;
+        goBtn.disabled = true;
+        goBtn.textContent = "Loading...";
+        cardsEl.innerHTML = "";
+        cardData = [];
+
+        for (const url of urls) {
+          const index = cardData.length;
+          cardData.push({ url, status: "loading" });
+          renderCard(index);
+          try {
+            const data = await requestJson("/api/info", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url })
+            });
+            cardData[index] = {
+              ...cardData[index],
+              status: "ready",
+              title: data.title || "",
+              thumbnail: data.thumbnail || "",
+              duration: data.duration,
+              uploader: data.uploader || "",
+              formats: data.formats || [],
+              selectedFormatId: data.formats && data.formats.length ? data.formats[0].id : null
+            };
+          } catch (error) {
+            cardData[index] = { ...cardData[index], status: "info-error", error: error.message };
+          }
+          renderCard(index);
+        }
+
+        renderDownloadAll();
+        goBtn.disabled = false;
+        goBtn.textContent = "Fetch";
+      }
+
+      async function dlCard(index) {
+        const clip = cardData[index];
+        clip.status = "downloading";
+        clip.error = "";
+        renderCard(index);
+        try {
+          const data = await requestJson("/api/download", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: clip.url,
+              format: currentFormat,
+              format_id: clip.selectedFormatId,
+              title: clip.title || ""
+            })
+          });
+          clip.jobId = data.job_id;
+          pollCard(index);
+        } catch (error) {
+          clip.status = "error";
+          clip.error = error.message;
+          renderCard(index);
+        }
+      }
+
+      function pollCard(index) {
+        const clip = cardData[index];
+        const interval = window.setInterval(async () => {
+          try {
+            const data = await requestJson(`/api/status/${clip.jobId}`);
+            if (data.status === "done") {
+              window.clearInterval(interval);
+              clip.status = "done";
+              clip.filename = data.filename;
+              renderCard(index);
+              saveCard(index);
+            } else if (data.status === "error") {
+              window.clearInterval(interval);
+              clip.status = "error";
+              clip.error = data.error || "Download failed";
+              renderCard(index);
+            }
+          } catch (error) {
+            window.clearInterval(interval);
+            clip.status = "error";
+            clip.error = error.message;
+            renderCard(index);
+          }
+        }, 1000);
+      }
+
+      function saveCard(index) {
+        const clip = cardData[index];
+        if (!clip.jobId) return;
+        const link = document.createElement("a");
+        link.href = apiUrl(`/api/file/${clip.jobId}`);
+        link.download = clip.filename || "";
+        link.click();
+      }
+
+      async function dlAll() {
+        const button = document.querySelector(".dl-all-btn");
+        if (button) { button.disabled = true; button.textContent = "Downloading..."; }
+        for (let index = 0; index < cardData.length; index += 1) {
+          if (cardData[index].status === "ready") await dlCard(index);
+        }
+        if (button) { button.disabled = false; button.textContent = "Download All"; }
+      }
+
+      function pickFormat(index, formatId) {
+        cardData[index].selectedFormatId = formatId;
+        renderCard(index);
+      }
+
+      formatButtons.forEach((button) => button.addEventListener("click", () => setFormat(button.dataset.format)));
+      urlsInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); go(); }
+      });
+      goBtn.addEventListener("click", go);
+      saveApiBtn.addEventListener("click", () => setApiBase(apiBaseInput.value));
+      resetApiBtn.addEventListener("click", () => setApiBase(""));
+      window.pickFormat = pickFormat;
+      window.dlCard = dlCard;
+      window.saveCard = saveCard;
+      window.dlAll = dlAll;
+      apiBaseInput.value = getApiBase();
+      renderConnection();
+    </script>
+  </body>
+</html>

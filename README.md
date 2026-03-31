@@ -21,6 +21,16 @@ A lightweight static page that showcases:
 - group summaries
 - operator-console vibes for demos
 - app subpages like Raj Bala's Health Tracker
+- app ports like ReClip under `apps/reclip/`
+
+## Current app routes
+
+- `/apps/health-tracker/`
+- `/apps/stock-pulse/`
+- `/apps/reclip/`
+
+`/apps/reclip/` is the ported ReClip frontend. The download worker still needs a Flask plus
+`yt-dlp` backend.
 
 ## Firebase Hosting auto deploy
 
