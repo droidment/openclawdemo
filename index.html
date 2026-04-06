@@ -3,73 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenClaw Meetup — Terminal Demo</title>
+    <title>OpenClaw Apps</title>
     <meta
       name="description"
-      content="A hacker-style landing page for the OpenClaw meetup demo — chat-driven automation, workflows, summaries, and AI agents that actually get work done."
+      content="A clean launchpad for OpenClaw apps with room for more apps in the future."
     />
     <style>
       :root {
         --bg: #f5f5f7;
         --bg-soft: #ffffff;
-        --panel: rgba(255, 255, 255, 0.82);
-        --panel-strong: rgba(255, 255, 255, 0.94);
+        --panel: rgba(255, 255, 255, 0.86);
+        --panel-strong: rgba(255, 255, 255, 0.96);
         --line: rgba(60, 60, 67, 0.14);
         --text: #1d1d1f;
         --muted: #6e6e73;
-        --green: #0071e3;
-        --green-2: #5ac8fa;
-        --amber: #ff9f0a;
-        --cyan: #5ac8fa;
+        --accent: #0071e3;
+        --accent-soft: #5ac8fa;
+        --warning: #ff9f0a;
         --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
       }
 
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background:
-          radial-gradient(circle at top, rgba(0, 113, 227, 0.10), transparent 36%),
+          radial-gradient(circle at top, rgba(0, 113, 227, 0.08), transparent 34%),
           linear-gradient(180deg, #fbfbfd 0%, #eef1f5 100%);
         color: var(--text);
         min-height: 100vh;
-        overflow-x: hidden;
       }
 
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        background-image: linear-gradient(rgba(60, 60, 67, 0.035) 1px, transparent 1px);
-        background-size: 100% 3px;
-        mix-blend-mode: soft-light;
-        opacity: 0.35;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .wrap {
-        width: min(1180px, calc(100% - 32px));
-        margin: 0 auto;
-      }
+      a { color: inherit; text-decoration: none; }
+      .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 
       .topbar {
         position: sticky;
         top: 0;
         z-index: 20;
-        backdrop-filter: blur(12px);
-        background: rgba(250, 250, 252, 0.78);
+        backdrop-filter: blur(14px);
+        background: rgba(250, 250, 252, 0.82);
         border-bottom: 1px solid var(--line);
       }
 
@@ -82,19 +56,19 @@
       }
 
       .brand {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 12px;
         font-weight: 700;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.01em;
       }
 
       .brand-mark {
         width: 12px;
         height: 12px;
         border-radius: 999px;
-        background: var(--green);
-        box-shadow: 0 0 18px var(--green);
+        background: var(--accent);
+        box-shadow: 0 0 18px rgba(0, 113, 227, 0.28);
       }
 
       .nav {
@@ -105,151 +79,104 @@
       }
 
       .hero {
-        padding: 68px 0 32px;
+        padding: 56px 0 28px;
       }
 
-      .terminal {
-        position: relative;
-        border: 1px solid rgba(60, 60, 67, 0.12);
+      .hero-card,
+      .app-card,
+      .slot-card,
+      .note-card {
+        border: 1px solid var(--line);
         border-radius: 24px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 247, 0.96));
+        background: var(--panel);
         box-shadow: var(--shadow);
-        overflow: hidden;
       }
 
-      .terminal-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 18px;
-        border-bottom: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.02);
-      }
-
-      .terminal-dots {
-        display: flex;
-        gap: 8px;
-      }
-
-      .terminal-dots span {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-        display: inline-block;
-      }
-
-      .dot-red { background: #ff6b6b; }
-      .dot-amber { background: var(--amber); }
-      .dot-green { background: var(--green); }
-
-      .terminal-label {
-        color: var(--muted);
-        font-size: 0.84rem;
-        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-      }
-
-      .hero-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 26px;
-        padding: 28px;
+      .hero-card {
+        padding: 32px;
+        background:
+          radial-gradient(circle at top right, rgba(90, 200, 250, 0.10), transparent 28%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 245, 247, 0.96));
       }
 
       .eyebrow {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-        color: var(--green);
-        font-size: 0.88rem;
+        color: var(--accent);
+        font-size: 0.84rem;
         text-transform: uppercase;
         letter-spacing: 0.12em;
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
       }
 
       h1 {
-        margin: 18px 0 16px;
-        font-size: clamp(2.8rem, 7vw, 5.5rem);
+        margin: 16px 0 12px;
+        font-size: clamp(2.6rem, 7vw, 5rem);
         line-height: 0.98;
         letter-spacing: -0.06em;
       }
 
       .lead {
         margin: 0;
-        max-width: 760px;
+        max-width: 720px;
         color: var(--muted);
-        font-size: 1.08rem;
         line-height: 1.8;
+        font-size: 1.05rem;
       }
 
       .hero-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 14px;
-        margin-top: 28px;
+        margin-top: 24px;
       }
 
       .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        padding: 14px 18px;
+        padding: 13px 18px;
         border-radius: 14px;
-        border: 1px solid rgba(0, 113, 227, 0.18);
+        border: 1px solid rgba(0, 113, 227, 0.16);
         font-weight: 700;
-        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-      }
-
-      .btn:hover {
-        transform: translateY(-1px);
       }
 
       .btn-primary {
         background: linear-gradient(135deg, rgba(0, 113, 227, 0.12), rgba(90, 200, 250, 0.10));
-        color: var(--text);
       }
 
       .btn-secondary {
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(255, 255, 255, 0.72);
         color: var(--muted);
       }
 
-      .hero-stats {
+      .summary-row {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 24px;
       }
 
-      .stat,
-      .panel,
-      .command,
-      .feature,
-      .timeline-item {
-        border: 1px solid var(--line);
-        background: var(--panel);
-        border-radius: 18px;
-        box-shadow: var(--shadow);
-      }
-
-      .stat {
+      .note-card {
         padding: 18px;
       }
 
-      .stat-label {
+      .note-label {
         color: var(--muted);
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         text-transform: uppercase;
         letter-spacing: 0.12em;
       }
 
-      .stat-value {
-        margin-top: 10px;
-        font-size: 1.8rem;
-        font-weight: 800;
+      .note-value {
+        margin-top: 8px;
+        font-size: 1.15rem;
+        font-weight: 700;
       }
 
       section {
-        padding: 32px 0;
+        padding: 20px 0 34px;
       }
 
       .section-head {
@@ -262,75 +189,15 @@
 
       .section-head h2 {
         margin: 8px 0 0;
-        font-size: clamp(1.8rem, 4vw, 3rem);
+        font-size: clamp(1.7rem, 4vw, 2.8rem);
         letter-spacing: -0.04em;
       }
 
       .section-head p {
         margin: 0;
-        max-width: 640px;
+        max-width: 620px;
         color: var(--muted);
         line-height: 1.7;
-      }
-
-      .features {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .feature {
-        padding: 22px;
-      }
-
-      .feature-kicker {
-        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-        color: var(--cyan);
-        font-size: 0.84rem;
-      }
-
-      .feature h3 {
-        margin: 12px 0 10px;
-        font-size: 1.25rem;
-      }
-
-      .feature p {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.7;
-      }
-
-      .commands {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .command {
-        padding: 20px;
-      }
-
-      .command-label {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(105, 255, 148, 0.08);
-        border: 1px solid rgba(105, 255, 148, 0.16);
-        color: var(--green);
-        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-        font-size: 0.88rem;
-      }
-
-      .command p {
-        margin: 14px 0 0;
-        color: var(--muted);
-        line-height: 1.7;
-      }
-
-      .demo-grid {
-        display: grid;
-        grid-template-columns: 0.92fr 1.08fr;
-        gap: 18px;
       }
 
       .apps-grid {
@@ -339,160 +206,108 @@
         gap: 18px;
       }
 
-      .app-card {
+      .app-card,
+      .slot-card {
         display: block;
         padding: 24px;
-        border: 1px solid rgba(0, 113, 227, 0.18);
-        border-radius: 24px;
-        background:
-          radial-gradient(circle at top right, rgba(101, 241, 255, 0.12), transparent 35%),
-          linear-gradient(180deg, rgba(10, 24, 15, 0.96), rgba(4, 11, 7, 0.96));
-        box-shadow: var(--shadow);
-        transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
       }
 
-      .app-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(105, 255, 148, 0.4);
-        box-shadow: 0 18px 40px rgba(57, 216, 122, 0.14);
+      .app-card:hover,
+      .slot-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(0, 113, 227, 0.22);
       }
 
-      .app-card-top {
+      .card-top {
         display: flex;
         align-items: start;
         justify-content: space-between;
-        gap: 18px;
+        gap: 14px;
       }
 
-      .app-badge {
+      .badge,
+      .route {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
         padding: 6px 10px;
         border-radius: 999px;
-        border: 1px solid rgba(101, 241, 255, 0.18);
-        background: rgba(101, 241, 255, 0.08);
-        color: var(--cyan);
-        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-        font-size: 0.82rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
+        font-size: 0.78rem;
       }
 
-      .app-card h3 {
+      .badge {
+        background: rgba(0, 113, 227, 0.08);
+        color: var(--accent);
+        border: 1px solid rgba(0, 113, 227, 0.12);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      .route {
+        background: rgba(60, 60, 67, 0.05);
+        color: var(--muted);
+        border: 1px solid rgba(60, 60, 67, 0.08);
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      }
+
+      .app-card h3,
+      .slot-card h3 {
         margin: 16px 0 10px;
-        font-size: 1.7rem;
+        font-size: 1.6rem;
         letter-spacing: -0.04em;
       }
 
-      .app-card p {
+      .app-card p,
+      .slot-card p {
         margin: 0;
         color: var(--muted);
         line-height: 1.75;
       }
 
-      .app-meta {
+      .meta-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
-        margin-top: 22px;
+        margin-top: 18px;
       }
 
-      .app-meta-block {
+      .meta-block {
         padding: 14px;
         border: 1px solid var(--line);
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(255, 255, 255, 0.7);
       }
 
-      .app-meta-label {
+      .meta-label {
         display: block;
         color: var(--muted);
-        font-size: 0.78rem;
+        font-size: 0.76rem;
         text-transform: uppercase;
         letter-spacing: 0.12em;
       }
 
-      .app-meta-value {
+      .meta-value {
         display: block;
         margin-top: 8px;
         font-weight: 700;
       }
 
-      .app-card-footer {
+      .card-footer {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        margin-top: 22px;
-        padding-top: 18px;
-        border-top: 1px solid rgba(105, 255, 148, 0.12);
-        color: var(--green);
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+        color: var(--accent);
         font-weight: 700;
       }
 
-      .panel {
-        padding: 22px;
-      }
-
-      .terminal-shot {
-        background: var(--panel-strong);
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        padding: 18px;
-        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-        color: var(--green);
-        min-height: 320px;
-        white-space: pre-wrap;
-        line-height: 1.65;
-        overflow: hidden;
-      }
-
-      .timeline {
-        display: grid;
-        gap: 14px;
-      }
-
-      .timeline-item {
-        padding: 18px;
-      }
-
-      .timeline-item strong {
-        display: block;
-        margin-bottom: 8px;
-      }
-
-      .timeline-item p {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.7;
-      }
-
-      .cta {
-        padding-bottom: 72px;
-      }
-
-      .cta-box {
-        padding: 30px;
-        border-radius: 24px;
-        border: 1px solid rgba(105, 255, 148, 0.18);
-        background:
-          radial-gradient(circle at top right, rgba(105, 255, 148, 0.12), transparent 35%),
-          linear-gradient(180deg, rgba(11, 28, 17, 0.95), rgba(5, 12, 8, 0.96));
-        box-shadow: var(--shadow);
-      }
-
-      .cta-box h2 {
-        margin: 0 0 10px;
-        font-size: clamp(2rem, 4vw, 3.25rem);
-        letter-spacing: -0.05em;
-      }
-
-      .cta-box p {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.8;
-        max-width: 700px;
+      .slot-card {
+        border-style: dashed;
+        background: rgba(255, 255, 255, 0.62);
       }
 
       .footer {
@@ -503,15 +318,14 @@
       }
 
       @media (max-width: 980px) {
-        .hero-grid,
-        .features,
-        .commands,
-        .demo-grid,
-        .apps-grid {
+        .summary-row,
+        .apps-grid,
+        .meta-grid {
           grid-template-columns: 1fr;
         }
 
-        .nav {
+        .nav,
+        .section-head p {
           display: none;
         }
       }
@@ -521,26 +335,11 @@
           width: min(100% - 20px, 1180px);
         }
 
-        .hero {
-          padding-top: 30px;
-        }
-
-        .hero-grid,
-        .cta-box,
-        .panel,
-        .feature,
-        .command,
-        .timeline-item,
-        .app-card {
+        .hero-card,
+        .app-card,
+        .slot-card,
+        .note-card {
           padding: 18px;
-        }
-
-        .hero-stats {
-          grid-template-columns: 1fr;
-        }
-
-        .app-meta {
-          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -550,153 +349,40 @@
       <div class="wrap topbar-inner">
         <a class="brand" href="#top">
           <span class="brand-mark"></span>
-          <span>OpenClaw Meetup</span>
+          <span>OpenClaw Apps</span>
         </a>
         <nav class="nav">
           <a href="#apps">Apps</a>
-          <a href="#features">Why it hits</a>
-          <a href="#commands">Trigger menu</a>
-          <a href="#demo">Demo flow</a>
-          <a href="#launch">Launch</a>
+          <a href="https://github.com/droidment/openclawdemo" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
       </div>
     </header>
 
     <main id="top">
       <section class="hero">
-        <div class="wrap terminal">
-          <div class="terminal-bar">
-            <div class="terminal-dots">
-              <span class="dot-red"></span>
-              <span class="dot-amber"></span>
-              <span class="dot-green"></span>
-            </div>
-            <div class="terminal-label">/demo/openclaw-meetup — live operator console</div>
+        <div class="wrap hero-card">
+          <div class="eyebrow">&gt; app launchpad</div>
+          <h1>OpenClaw Apps</h1>
+          <p class="lead">
+            A simple landing page for the apps in this repo. Open an app, share it, and add more apps over time.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#apps">View apps</a>
+            <a class="btn btn-secondary" href="https://github.com/droidment/openclawdemo" target="_blank" rel="noreferrer">View repo</a>
           </div>
-          <div class="hero-grid">
-            <div>
-              <div class="eyebrow">&gt; chat-native automation for people who hate dashboards</div>
-              <h1>Run AI workflows from the group chat.</h1>
-              <p class="lead">
-                OpenClaw turns everyday chat into an operator console. Ask for summaries, launch workflows,
-                steer agents, and keep the room synced without bouncing between tabs, docs, and terminals.
-                It’s fast, weirdly practical, and perfect for a live demo.
-              </p>
-              <div class="hero-actions">
-              <a class="btn btn-primary" href="#apps">Browse hacker apps</a>
-              <a class="btn btn-primary" href="/apps/health-tracker/">Health Tracker</a>
-              <a class="btn btn-primary" href="/apps/reclip/">ReClip Downloader</a>
-              <a class="btn btn-primary" href="#launch">Open the demo playbook</a>
-              <a class="btn btn-secondary" href="#commands">See the trigger menu</a>
-              </div>
+          <div class="summary-row">
+            <div class="note-card">
+              <div class="note-label">Live apps</div>
+              <div class="note-value">3</div>
             </div>
-            <div class="hero-stats">
-              <div class="stat">
-                <div class="stat-label">Interface</div>
-                <div class="stat-value">Chat-first</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">Vibe</div>
-                <div class="stat-value">Terminal</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">Demo-ready</div>
-                <div class="stat-value">Tomorrow</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">Best feature</div>
-                <div class="stat-value">Actually useful</div>
-              </div>
+            <div class="note-card">
+              <div class="note-label">Open slots</div>
+              <div class="note-value">2+</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="features">
-        <div class="wrap">
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">&gt; why this lands in a room full of builders</div>
-              <h2>Made for operator brains.</h2>
+            <div class="note-card">
+              <div class="note-label">Structure</div>
+              <div class="note-value">One app per route</div>
             </div>
-            <p>
-              This group exists to explore how OpenClaw can save time, tighten workflows, and make AI feel
-              less like a toy and more like an actual teammate.
-            </p>
-          </div>
-          <div class="features">
-            <article class="feature">
-              <div class="feature-kicker">01 / SUMMARIZE</div>
-              <h3>Turn noisy threads into signal</h3>
-              <p>
-                Use lightweight triggers like <strong>TL;DR</strong> to compress discussions into a clean readout of
-                key topics, decisions, questions, and next steps.
-              </p>
-            </article>
-            <article class="feature">
-              <div class="feature-kicker">02 / ROUTE</div>
-              <h3>Kick off workflows from plain English</h3>
-              <p>
-                Whether it’s stock workflows, coding tasks, or research, the interface is the same: say the thing,
-                get the workflow.
-              </p>
-            </article>
-            <article class="feature">
-              <div class="feature-kicker">03 / DEMO</div>
-              <h3>Show capability without context switching</h3>
-              <p>
-                Great demos are fast. Chat-driven controls let you show summaries, commands, automation, and live
-                delegation in one place.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="commands">
-        <div class="wrap">
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">&gt; current trigger menu</div>
-              <h2>Type less. Trigger more.</h2>
-            </div>
-            <p>
-              The power move is keeping the interface memorable. A tiny command surface beats a complicated control panel.
-            </p>
-          </div>
-          <div class="commands">
-            <article class="command">
-              <span class="command-label">TL;DR</span>
-              <p>
-                Summarize the current group discussion into a short, useful brief so everyone can catch up instantly.
-              </p>
-            </article>
-            <article class="command">
-              <span class="command-label">stock workflows</span>
-              <p>
-                Launch the stock workflow menu and branch into insider activity, earnings reaction, filings, comparison,
-                technical levels, scanners, and backtest ideas.
-              </p>
-            </article>
-            <article class="command">
-              <span class="command-label">insider XOM</span>
-              <p>
-                Run a focused insider read on a ticker with a fast narrative interpretation instead of dumping raw data.
-              </p>
-            </article>
-            <article class="command">
-              <span class="command-label">welcome flow</span>
-              <p>
-                New members get a clean intro, five working norms, and the live trigger menu so they can contribute immediately.
-              </p>
-            </article>
-            <article class="command">
-              <span class="command-label">@khusbhoo build app</span>
-              <p>
-                Use WhatsApp and OpenClaw to build new apps. Send your idea to <strong>@khusbhoo</strong>, and it will
-                help build the app for you, add a button to the trigger menu, and deploy the app into this site.
-              </p>
-            </article>
           </div>
         </div>
       </section>
@@ -705,172 +391,126 @@
         <div class="wrap">
           <div class="section-head">
             <div>
-              <div class="eyebrow">&gt; hacker launch grid</div>
-              <h2>Big buttons. One app per builder.</h2>
+              <div class="eyebrow">&gt; available now</div>
+              <h2>Apps</h2>
             </div>
-            <p>
-              Each card is a front door into someone’s project. Add their app name, a one-line pitch, builder names,
-              and link straight into their workspace under this same site.
-            </p>
+            <p>Current apps are listed first, followed by open slots for future builds.</p>
           </div>
-          <div class="panel" style="margin-bottom: 18px;">
-            <div class="eyebrow">&gt; build through whatsapp</div>
-            <p style="margin: 12px 0 0; color: var(--muted); line-height: 1.8;">
-              Use WhatsApp and OpenClaw to build new apps. Send your ideas to <strong>@khusbhoo</strong> and it will
-              build the app for you, add a button to the trigger menu, and deploy the app into this website.
-            </p>
-          </div>
+
           <div class="apps-grid">
             <a class="app-card" href="/apps/health-tracker/">
-              <div class="app-card-top">
-                <span class="app-badge">New app</span>
-                <span class="command-label">/apps/health-tracker</span>
+              <div class="card-top">
+                <span class="badge">Live</span>
+                <span class="route">/apps/health-tracker/</span>
               </div>
               <h3>Health Tracker</h3>
-              <p>
-                Tracks weight, calories in, calories out, and — most importantly — alcohol intake in a clean terminal-style
-                interface. Built for quick daily logging and instant deployability.
-              </p>
-              <div class="app-meta">
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Built by</span>
-                  <span class="app-meta-value">Raj Bala</span>
+              <p>Track weight, calories, workouts, and alcohol intake in one place.</p>
+              <div class="meta-grid">
+                <div class="meta-block">
+                  <span class="meta-label">Builder</span>
+                  <span class="meta-value">Raj Bala</span>
                 </div>
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Persistence</span>
-                  <span class="app-meta-value">Local device storage now, Firebase-ready next</span>
+                <div class="meta-block">
+                  <span class="meta-label">Type</span>
+                  <span class="meta-value">Personal tracker</span>
                 </div>
               </div>
-              <div class="app-card-footer">
-                <span>Open Health Tracker</span>
+              <div class="card-footer">
+                <span>Open app</span>
                 <span>&gt;</span>
               </div>
             </a>
 
             <a class="app-card" href="/apps/stock-pulse/">
-              <div class="app-card-top">
-                <span class="app-badge">Live sample</span>
-                <span class="command-label">/apps/stock-pulse</span>
+              <div class="card-top">
+                <span class="badge">Live</span>
+                <span class="route">/apps/stock-pulse/</span>
               </div>
               <h3>StockPulse Board</h3>
-              <p>
-                Tracks watchlist movers, catalyst notes, and trader callouts in one place. This sample subpage shows
-                the pattern for a user app with its own UI, data model, and room to wire in Firebase-backed records.
-              </p>
-              <div class="app-meta">
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Built by</span>
-                  <span class="app-meta-value">Arunkumar Thangaraj and Rohit</span>
+              <p>Watchlist dashboard for movers, catalysts, and market notes.</p>
+              <div class="meta-grid">
+                <div class="meta-block">
+                  <span class="meta-label">Builders</span>
+                  <span class="meta-value">Arunkumar Thangaraj and Rohit</span>
                 </div>
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Backend shape</span>
-                  <span class="app-meta-value">Shared Firebase project, isolated app paths</span>
+                <div class="meta-block">
+                  <span class="meta-label">Type</span>
+                  <span class="meta-value">Market dashboard</span>
                 </div>
               </div>
-              <div class="app-card-footer">
-                <span>Open app workspace</span>
+              <div class="card-footer">
+                <span>Open app</span>
                 <span>&gt;</span>
               </div>
             </a>
 
             <a class="app-card" href="/apps/reclip/">
-              <div class="app-card-top">
-                <span class="app-badge">Ported app</span>
-                <span class="command-label">/apps/reclip</span>
+              <div class="card-top">
+                <span class="badge">Live</span>
+                <span class="route">/apps/reclip/</span>
               </div>
               <h3>ReClip Downloader</h3>
-              <p>
-                Clean media downloader UI ported from the ReClip project. Paste links, fetch metadata,
-                pick MP4 or MP3, and send the job to a Flask plus yt-dlp backend.
-              </p>
-              <div class="app-meta">
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Built by</span>
-                  <span class="app-meta-value">droidment</span>
+              <p>Downloader interface for fetching media through a connected backend.</p>
+              <div class="meta-grid">
+                <div class="meta-block">
+                  <span class="meta-label">Builder</span>
+                  <span class="meta-value">droidment</span>
                 </div>
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Runtime</span>
-                  <span class="app-meta-value">Static UI here, downloader backend attached separately</span>
+                <div class="meta-block">
+                  <span class="meta-label">Type</span>
+                  <span class="meta-value">Utility tool</span>
                 </div>
               </div>
-              <div class="app-card-footer">
-                <span>Open ReClip workspace</span>
+              <div class="card-footer">
+                <span>Open app</span>
                 <span>&gt;</span>
               </div>
             </a>
 
-            <a class="app-card" href="#launch">
-              <div class="app-card-top">
-                <span class="app-badge">Template slot</span>
-                <span class="command-label">/apps/your-app</span>
+            <div class="slot-card">
+              <div class="card-top">
+                <span class="badge">Open slot</span>
+                <span class="route">/apps/your-app/</span>
               </div>
-              <h3>Your Next Build Here</h3>
-              <p>
-                Duplicate the sample app folder, swap in the new app name and builder names, then point this card to
-                the new route. It keeps the landing page consistent while every builder ships their own experience.
-              </p>
-              <div class="app-meta">
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Built by</span>
-                  <span class="app-meta-value">Add the hacker names</span>
+              <h3>Future App</h3>
+              <p>Reserved space for the next app added to this launchpad.</p>
+              <div class="meta-grid">
+                <div class="meta-block">
+                  <span class="meta-label">Builder</span>
+                  <span class="meta-value">TBD</span>
                 </div>
-                <div class="app-meta-block">
-                  <span class="app-meta-label">Use case</span>
-                  <span class="app-meta-value">Dashboards, trackers, tools, demos</span>
+                <div class="meta-block">
+                  <span class="meta-label">Type</span>
+                  <span class="meta-value">TBD</span>
                 </div>
               </div>
-              <div class="app-card-footer">
-                <span>Use the sample as the starting point</span>
-                <span>&gt;</span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section id="demo">
-        <div class="wrap demo-grid">
-          <div class="panel">
-            <div class="eyebrow">&gt; what the room sees</div>
-            <h2 style="margin: 12px 0 10px; font-size: 2rem; letter-spacing: -0.04em;">A terminal aesthetic with social UX.</h2>
-            <p style="margin: 0; color: var(--muted); line-height: 1.8;">
-              The whole point is not just “AI in chat.” It’s giving a group a shared command surface for workflows,
-              summaries, research, and coordination without turning the conversation into mush.
-            </p>
-            <div class="timeline" style="margin-top: 18px;">
-              <div class="timeline-item">
-                <strong>1. Ask in plain language</strong>
-                <p>Kick off a summary, stock workflow, or task from the same thread where the work is happening.</p>
-              </div>
-              <div class="timeline-item">
-                <strong>2. Get structured output</strong>
-                <p>Responses come back concise, useful, and shaped for the context — not generic chatbot sludge.</p>
-              </div>
-              <div class="timeline-item">
-                <strong>3. Iterate in public</strong>
-                <p>The group sees the prompts, the results, and the improvements in real time, which makes the demo stronger.</p>
+              <div class="card-footer">
+                <span>Available for new build</span>
+                <span>+</span>
               </div>
             </div>
-          </div>
-          <div class="panel">
-            <div class="eyebrow">&gt; simulated operator log</div>
-            <div class="terminal-shot" id="terminal-output"></div>
-          </div>
-        </div>
-      </section>
 
-      <section id="launch" class="cta">
-        <div class="wrap">
-          <div class="cta-box">
-            <div class="eyebrow">&gt; tomorrow’s playbook</div>
-            <h2>Demo the group like a live control room.</h2>
-            <p>
-              Show how OpenClaw can welcome, summarize, route workflows, and answer real questions inside the same chat.
-              That’s the story: less friction, more leverage, better group coordination.
-            </p>
-            <div class="hero-actions" style="margin-top: 24px;">
-              <a class="btn btn-primary" href="https://github.com/droidment/openclawdemo" target="_blank" rel="noreferrer">View repo</a>
-              <a class="btn btn-secondary" href="#commands">Use the trigger menu</a>
+            <div class="slot-card">
+              <div class="card-top">
+                <span class="badge">Open slot</span>
+                <span class="route">/apps/another-app/</span>
+              </div>
+              <h3>Future App</h3>
+              <p>Use this space to showcase another tool, dashboard, or experiment.</p>
+              <div class="meta-grid">
+                <div class="meta-block">
+                  <span class="meta-label">Builder</span>
+                  <span class="meta-value">TBD</span>
+                </div>
+                <div class="meta-block">
+                  <span class="meta-label">Type</span>
+                  <span class="meta-value">TBD</span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <span>Available for new build</span>
+                <span>+</span>
+              </div>
             </div>
           </div>
         </div>
@@ -878,57 +518,7 @@
     </main>
 
     <footer class="footer">
-      <div class="wrap">
-        OpenClaw Meetup — hacker terminal landing page for the demo repo, now live on Firebase Hosting.
-      </div>
+      <div class="wrap">OpenClaw Apps launchpad.</div>
     </footer>
-
-    <script>
-      const lines = [
-        '$ openclaw status',
-        '> gateway: online',
-        '> whatsapp: connected',
-        '> group: OpenClaw meetup',
-        '',
-        '$ trigger "TL;DR"',
-        '> summarizing discussion…',
-        '> output: main topics / ideas / next steps',
-        '',
-        '$ trigger "stock workflows"',
-        '> menu loaded: insider / earnings / compare / scanner / backtest',
-        '',
-        '$ ask "insider XOM"',
-        '> recent signal: insider selling, not buying',
-        '',
-        '$ demo tomorrow',
-        '> status: ready',
-        '> vibe: terminal-maximalist',
-        '> outcome: people get it instantly'
-      ];
-
-      const target = document.getElementById('terminal-output');
-      let lineIndex = 0;
-      let charIndex = 0;
-
-      function type() {
-        if (!target) return;
-        if (lineIndex >= lines.length) return;
-
-        const current = lines[lineIndex];
-        if (charIndex < current.length) {
-          target.textContent += current.charAt(charIndex);
-          charIndex += 1;
-          setTimeout(type, 18);
-          return;
-        }
-
-        target.textContent += '\n';
-        lineIndex += 1;
-        charIndex = 0;
-        setTimeout(type, 120);
-      }
-
-      type();
-    </script>
   </body>
 </html>
